@@ -5,14 +5,18 @@ version = "0.1.0"
 description = "ML production assignment"
 requires-python = ">=3.12"
 dependencies = [
+    "fastapi>=0.148.0",
     "imbalanced-learn",
     "joblib",
     "matplotlib",
     "pandas",
     "psutil>=7.2.2",
+    "pydantic>=2.14.1",
     "python-dotenv",
     "scikit-learn",
     "seaborn",
+    "streamlit>=1.66.0",
+    "uvicorn>=0.54.0",
 ]
 
 [tool.uv]

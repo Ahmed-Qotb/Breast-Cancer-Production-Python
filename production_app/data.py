@@ -1,13 +1,10 @@
 from pathlib import Path
 
 import pandas as pd
-from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
 
-from production_app.config import RANDOM_SEED, TEST_SIZE
+from production_app.config import FEATURES, config
 from production_app.logging_config import logger
-
-load_dotenv()
 
 
 # Load dataset function
@@ -22,6 +19,9 @@ def get_dataset(path: Path) -> pd.DataFrame:
 
     df = pd.read_csv(dataset_path)
 
+    # Keep only complete rows for the selected features and target
+    df = df.drop_duplicates().dropna(subset=FEATURES + [config.target])
+
     # Drop unnecessary columns
     df.drop(columns=["Unnamed: 32", "id"], errors="ignore", inplace=True)
 
@@ -30,39 +30,19 @@ def get_dataset(path: Path) -> pd.DataFrame:
     return df
 
 
-# Spliting the data and separating numirical from catigorical
+# Split the selected features into train and test sets
 def split_dataset(df):
-    X = df.drop(columns=["diagnosis"])
-    y = df["diagnosis"].map({"B": 0, "M": 1})
+    X = df[FEATURES]
+    y = df[config.target].map({"B": 0, "M": 1})
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
-        test_size=TEST_SIZE,
-        random_state=RANDOM_SEED,
+        test_size=config.test_size,
+        random_state=config.random_state,
         stratify=y,
     )
 
     logger.info("Dataset split completed")
 
     return X_train, X_test, y_train, y_test
-
-
-# if __name__ == "__main__":
-#     df = get_dataset(DATA_PATH)
-
-#     X_train, X_test, y_train, y_test = split_dataset(df)
-
-#     print("Dataset loaded:", df.shape)
-#     print("Training features:", X_train.shape)
-#     print("Testing features:", X_test.shape)
-#     print("Training target:", y_train.shape)
-#     print("Testing target:", y_test.shape)
-
-#     assert "diagnosis" not in X_train.columns
-#     assert len(X_train) == len(y_train)
-#     assert len(X_test) == len(y_test)
-#     assert set(y_train.unique()).issubset({0, 1})
-#     assert set(y_test.unique()).issubset({0, 1})
-
-#     print("All data tests passed!")
