@@ -1,0 +1,31 @@
+# Base image
+FROM python:3.12-slim
+
+# Switch to root for installs; the runtime uses numeric UID 1001
+USER root
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Work directory
+WORKDIR /app
+
+# Install dependencies from the lockfile
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-cache
+
+# Copy source code and data
+COPY --chown=1001:0 production_app ./production_app
+COPY --chown=1001:0 ui ./ui
+COPY --chown=1001:0 data ./data
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Switch user
+USER 1001
+
+# Streamlit port
+EXPOSE 8501
+
+# Run Streamlit
+CMD ["streamlit", "run", "ui/streamlit_app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
