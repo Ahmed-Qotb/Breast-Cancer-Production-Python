@@ -3,3 +3,5 @@
 __pycache__
 *.py[cod]
 .ipynb_checkpoints/
+api_err.log
+api_out.log
