@@ -1,0 +1,10 @@
+name: Welcome to GitHub
+
+on: [push]
+
+jobs:
+  say-welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print welcome
+        run: echo "Welcome, ${{ github.actor }}"
