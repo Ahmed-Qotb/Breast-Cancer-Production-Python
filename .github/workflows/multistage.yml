@@ -1,1 +1,20 @@
+name: multistage env
 
+on: [push]
+
+jobs:
+  stage-1-prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      message: ${{ steps.prepare.outputs.message }}
+    steps:
+      - name: prepare-message
+        id: prepare
+        run: echo "message=${{ github.actor }} welcome from stage 1" >> "$GITHUB_OUTPUT"
+
+  stage-2-great:
+    needs: stage-1-prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: prepare-message
+        run: echo "${{ needs.stage-1-prepare.outputs.message }} great from stage 2"
